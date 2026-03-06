@@ -1,21 +1,17 @@
 Export the current conversation to a detailed session file without requiring a pre-initialized session. Use this when you need to preserve context before compacting or ending a conversation.
 
 ## Usage
-
 ```
 /export-session
 ```
 
 ## Parameters
-
 None.
 
 ## Prerequisites
-
 None -- this command works without `/session` initialization.
 
 Steps:
-
 1. Determine the current working directory
 2. Create an `_sessions` directory in the current working directory if it doesn't exist
 3. Generate a filename: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}.md`
@@ -86,13 +82,11 @@ To compact now with full context, use:
 ## Post-Compaction Re-orientation
 
 If Claude detects it has just been compacted and an export file exists in `_sessions/`:
-
 1. Read the most recent export file
 2. Find the Resume Context section
 3. Announce: "Resumed from session export. {one-line summary}. Ready to continue."
 
 ## Notes
-
 - This command does NOT require `/session` to have been run first
 - Use this as an emergency pre-compact export or as a standalone session documenter
 - The `_sessions/` directory can be added to `.gitignore` if you don't want exports in version control

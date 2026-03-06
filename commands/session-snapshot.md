@@ -1,22 +1,18 @@
 Capture a progress snapshot for the active session and append it to the session file.
 
 ## Usage
-
 ```
 /session-snapshot
 ```
 
 ## Parameters
-
 None - uses the active session stored in memory.
 
 ## Prerequisites
-
 - An active session must be initialized with `/session` command first
 - Session ID and filename should be stored in memory
 
 Steps:
-
 1. Retrieve the active session information from memory (Session ID and filename)
 2. If no active session found in memory, ask the user for the session ID or tell them to run `/session` first
 3. Locate the session file: `*_{session-id}.md` in the current working directory
@@ -86,7 +82,6 @@ This gives the user a ready-to-use compact command with the right instructions b
 ## Post-Compaction Re-orientation
 
 If Claude detects that a compaction has just occurred (conversation history is short, or context feels reset) and there is an active session in memory:
-
 1. Read the session file from disk
 2. Find the most recent Resume Context section
 3. Announce: "Resumed from snapshot {N}. {one-line summary}. Ready to continue."
@@ -94,7 +89,6 @@ If Claude detects that a compaction has just occurred (conversation history is s
 ## Keyword-Based Auto-Triggering
 
 **Instructions for Claude:** When the user mentions any of these phrases during conversation:
-
 - "track session progress"
 - "capture progress"
 - "session snapshot"
@@ -102,7 +96,6 @@ If Claude detects that a compaction has just occurred (conversation history is s
 - "record progress"
 
 **Action to take:**
-
 1. Detect the keyword/phrase
 2. Ask the user: "Would you like me to capture a session snapshot now?"
 3. If user confirms (yes/ok/sure/etc.), automatically invoke `/session-snapshot`
@@ -111,7 +104,6 @@ If Claude detects that a compaction has just occurred (conversation history is s
 This enables semi-automatic progress tracking based on natural conversation flow.
 
 ## Notes
-
 - This command works with the active session stored in memory
 - Use this command whenever you want to capture current progress
 - Multiple snapshots can be appended to the same file over time
