@@ -21,8 +21,9 @@ Steps:
 6. Count existing snapshots in the file to determine the next snapshot number
 7. Generate a progress snapshot following the format below
 8. Append the snapshot to the session file
-9. After appending, output a suggested `/compact` command (see Post-Snapshot Compact Suggestion)
-10. Confirm to the user that the snapshot was appended successfully
+9. Write a companion compact instructions file (see Compact Instructions File)
+10. Output the compact instructions to the terminal as well
+11. Confirm to the user that the snapshot was appended successfully
 
 ## Snapshot Format
 
@@ -68,16 +69,27 @@ has zero prior context about this session.]
 ---
 ```
 
-## Post-Snapshot Compact Suggestion
+## Compact Instructions File
 
-After each snapshot, output the following to the user:
+After appending the snapshot, write a companion file at `{session-filepath}.compact.md` containing:
 
 ```
-Snapshot captured. If you'd like to compact now, use:
-/compact Preserve session context from {filename}. Focus on the most recent Resume Context: {paste the Resume Context paragraph you just wrote}
+/compact Preserve session context from {session-filename}. Focus on the most recent Resume Context: {paste the Resume Context paragraph you just wrote}
 ```
 
-This gives the user a ready-to-use compact command with the right instructions baked in.
+This file sits alongside the session file (e.g., `My-Session_abc123.md.compact.md`) and is overwritten on each snapshot so it always reflects the latest resume context.
+
+## Post-Snapshot Output
+
+After writing both files, output to the terminal:
+
+```
+Snapshot {N} captured and appended to {session-filename}.
+Compact instructions saved to: {session-filepath}.compact.md
+
+To compact now with full context, use:
+/compact Preserve session context from {session-filename}. Focus on the most recent Resume Context: {resume context}
+```
 
 ## Post-Compaction Re-orientation
 
@@ -109,3 +121,4 @@ This enables semi-automatic progress tracking based on natural conversation flow
 - Multiple snapshots can be appended to the same file over time
 - The Resume Context section is critical -- write it as if briefing a new developer joining mid-project
 - The Decisions & Rationale section captures *why*, not just *what* -- this is the most valuable part for future reference
+- The companion `.compact.md` file is overwritten on each snapshot -- it always has the latest compact instructions

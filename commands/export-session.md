@@ -2,24 +2,28 @@ Export the current conversation to a detailed session file without requiring a p
 
 ## Usage
 ```
-/export-session
+/export-session [session-id]
 ```
 
 ## Parameters
-None.
+- **session-id** (optional): A session ID to include in the filename. If omitted, checks memory for an active session ID first.
 
 ## Prerequisites
 None -- this command works without `/session` initialization.
 
 Steps:
 1. Determine the current working directory
-2. Create an `_sessions` directory in the current working directory if it doesn't exist
-3. Generate a filename: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}.md`
-4. Review the full conversation history carefully
-5. Infer a short descriptive title for the session based on what was discussed
-6. Write the export file following the format below
-7. Output a ready-to-use `/compact` command with the resume context baked in
-8. Confirm to the user that the export was written and the compact command is ready
+2. Check memory for an active session ID. If found, use it. If not, use the optional `session-id` parameter. Either or neither may be available.
+3. Create an `_sessions` directory in the current working directory if it doesn't exist
+4. Generate a filename:
+   - With session ID: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}_{session-id}.md`
+   - Without session ID: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}.md`
+5. Review the full conversation history carefully
+6. Infer a short descriptive title for the session based on what was discussed
+7. Write the export file following the format below
+8. Write a companion compact instructions file (see Compact Instructions File)
+9. Output the compact instructions to the terminal as well
+10. Confirm to the user that the export and compact file were written
 
 ## Export File Format
 
@@ -28,6 +32,7 @@ Steps:
 
 **Exported:** {timestamp}
 **Working Directory:** {cwd}
+**Session ID:** {session-id or "N/A"}
 
 ---
 
@@ -68,15 +73,26 @@ context, and the immediate next step. This must be self-contained -- assume the 
 has zero prior context.]
 ```
 
-## Post-Export Compact Suggestion
+## Compact Instructions File
 
-After writing the file, output:
+After writing the export file, write a companion file at `{export-filepath}.compact.md` containing:
 
 ```
-Session exported to: {filepath}
+/compact Preserve session context from {export-filename}. Focus on the most recent Resume Context: {paste the Resume Context paragraph you just wrote}
+```
+
+This file sits alongside the export (e.g., `_sessions/session-export-2026-03-06-143000_abc123.md.compact.md`) so the compact instructions are always on disk and easy to find.
+
+## Post-Export Output
+
+After writing both files, output to the terminal:
+
+```
+Session exported to: {export-filepath}
+Compact instructions saved to: {export-filepath}.compact.md
 
 To compact now with full context, use:
-/compact {paste the Resume Context paragraph you just wrote}
+/compact Preserve session context from {export-filename}. Focus on the most recent Resume Context: {resume context}
 ```
 
 ## Post-Compaction Re-orientation
@@ -90,4 +106,5 @@ If Claude detects it has just been compacted and an export file exists in `_sess
 - This command does NOT require `/session` to have been run first
 - Use this as an emergency pre-compact export or as a standalone session documenter
 - The `_sessions/` directory can be added to `.gitignore` if you don't want exports in version control
-- If an active session IS stored in memory, mention it in the export and suggest the user also run `/session-snapshot` for that file
+- If an active session IS stored in memory, mention it in the export header and suggest the user also run `/session-snapshot` for the tracked session file
+- The companion `.compact.md` file is overwritten each time -- it always reflects the latest export
