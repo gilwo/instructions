@@ -83,13 +83,20 @@ After writing the export file, write a companion file at `{export-filepath}.comp
 
 This file sits alongside the export (e.g., `_sessions/session-export-2026-03-06-143000_abc123.md.compact.md`) so the compact instructions are always on disk and easy to find.
 
+Additionally, write (or overwrite) a per-session latest compact file:
+- With session ID: `_sessions/latest_{session-id}.compact.md`
+- Without session ID: `_sessions/latest.compact.md`
+
+This file always reflects the most recent export for that session, so you can always find the latest compact instructions at a predictable path.
+
 ## Post-Export Output
 
-After writing both files, output to the terminal:
+After writing all files, output to the terminal:
 
 ```
 Session exported to: {export-filepath}
 Compact instructions saved to: {export-filepath}.compact.md
+Latest compact: _sessions/latest_{session-id}.compact.md
 
 To compact now with full context, use:
 /compact Preserve session context from {export-filename}. Focus on the most recent Resume Context: {resume context}
