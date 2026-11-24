@@ -2,11 +2,12 @@ Export the current conversation to a detailed session file without requiring a p
 
 ## Usage
 ```
-/export-session [session-id]
+/export-session [session-id] [reason]
 ```
 
 ## Parameters
 - **session-id** (optional): A session ID to include in the filename. If omitted, checks memory for an active session ID first.
+- **reason** (optional): A free-text statement of why you're exporting now. If omitted, the command will pause and ask for it (see Capturing Export Reason).
 
 ## Prerequisites
 None -- this command works without `/session` initialization.
@@ -14,16 +15,24 @@ None -- this command works without `/session` initialization.
 Steps:
 1. Determine the current working directory
 2. Check memory for an active session ID. If found, use it. If not, use the optional `session-id` parameter. Either or neither may be available.
-3. Create an `_sessions` directory in the current working directory if it doesn't exist
-4. Generate a filename:
+3. Determine the **Export Reason** (see Capturing Export Reason below)
+4. Create an `_sessions` directory in the current working directory if it doesn't exist
+5. Generate a filename:
    - With session ID: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}_{session-id}.md`
    - Without session ID: `_sessions/session-export-{YYYY-MM-DD}-{HHMMSS}.md`
-5. Review the full conversation history carefully
-6. Infer a short descriptive title for the session based on what was discussed
-7. Write the export file following the format below
-8. Write a companion compact instructions file (see Compact Instructions File)
-9. Output the compact instructions to the terminal as well
-10. Confirm to the user that the export and compact file were written
+6. Review the full conversation history carefully
+7. Infer a short descriptive title for the session based on what was discussed
+8. Write the export file following the format below
+9. Write a companion compact instructions file (see Compact Instructions File)
+10. Output the compact instructions to the terminal as well
+11. Confirm to the user that the export and compact file were written
+
+## Capturing Export Reason
+
+- If a `reason` argument was provided inline, use it directly (do not ask).
+- If no `reason` was provided, pause and ask the user: **"What's the reason for this export?"** Then wait for their reply.
+- Skipping: a short sentinel reply (`-`, `.`, `n`, `no`, `skip`) means skip → record Export Reason as `(not provided)`. Any longer reply is treated as the reason text. (A truly empty Enter can't reach Claude, so a sentinel is required to skip.)
+- Drift note: if a `Purpose` exists in memory for the active session AND the Export Reason clearly diverges from it, add a one-line italic note under the Export Reason: `_Drift from original purpose: {one-line description}_`. If no Purpose is in memory, omit the drift note entirely (a bare export with no active session simply records its reason with nothing to compare against).
 
 ## Export File Format
 
@@ -33,6 +42,10 @@ Steps:
 **Exported:** {timestamp}
 **Working Directory:** {cwd}
 **Session ID:** {session-id or "N/A"}
+
+## Export Reason
+{reason, or "(not provided)" if skipped}
+{optional: _Drift from original purpose: ..._}
 
 ---
 
@@ -67,10 +80,13 @@ Steps:
 
 ## Resume Context
 [A dense 5-8 sentence paragraph written FOR Claude, containing everything needed
-to continue this work after compaction or in a new conversation. Include: current
-goal, what has been done so far, what is in progress, key files involved, architectural
-context, and the immediate next step. This must be self-contained -- assume the reader
-has zero prior context.]
+to continue this work after compaction or in a new conversation. LEAD with the goal:
+open with the session Purpose (if known from memory) plus the Export Reason (e.g.,
+"Goal: {Purpose}; exporting because {reason}."). If reason/purpose were skipped, fall
+back to the auto-inferred goal as the opening instead -- do not write an empty "Goal:"
+line. Then continue with: what has been done so far, what is in progress, key files
+involved, architectural context, and the immediate next step. This must be
+self-contained -- assume the reader has zero prior context.]
 ```
 
 ## Compact Instructions File

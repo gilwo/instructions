@@ -2,33 +2,45 @@ Capture a progress snapshot for the active session and append it to the session 
 
 ## Usage
 ```
-/session-snapshot
+/session-snapshot [intent]
 ```
 
 ## Parameters
-None - uses the active session stored in memory.
+- **intent** (optional): A free-text statement of why you're capturing this snapshot / what the current focus is. If omitted, the command will pause and ask for it (see Capturing Intent).
 
 ## Prerequisites
 - An active session must be initialized with `/session` command first
 - Session ID and filename should be stored in memory
 
 Steps:
-1. Retrieve the active session information from memory (Session ID and filename)
+1. Retrieve the active session information from memory (Session ID, filename, and Purpose if present)
 2. If no active session found in memory, ask the user for the session ID or tell them to run `/session` first
 3. Locate the session file: `*_{session-id}.md` in the current working directory
 4. If file not found, inform the user and ask them to verify the session was initialized
-5. Review the full conversation history carefully before generating the snapshot
-6. Count existing snapshots in the file to determine the next snapshot number
-7. Generate a progress snapshot following the format below
-8. Append the snapshot to the session file
-9. Write a companion compact instructions file (see Compact Instructions File)
-10. Output the compact instructions to the terminal as well
-11. Confirm to the user that the snapshot was appended successfully
+5. Determine the snapshot **Intent** (see Capturing Intent below)
+6. Review the full conversation history carefully before generating the snapshot
+7. Count existing snapshots in the file to determine the next snapshot number
+8. Generate a progress snapshot following the format below
+9. Append the snapshot to the session file
+10. Write a companion compact instructions file (see Compact Instructions File)
+11. Output the compact instructions to the terminal as well
+12. Confirm to the user that the snapshot was appended successfully
+
+## Capturing Intent
+
+- If an `intent` argument was provided inline, use it directly (do not ask).
+- If no `intent` was provided, pause and ask the user: **"What's the intention of this snapshot — has the focus shifted since you started?"** Then wait for their reply.
+- Skipping: a short sentinel reply (`-`, `.`, `n`, `no`, `skip`) means skip → record Intent as `(not provided)`. Any longer reply is treated as the intent text. (A truly empty Enter can't reach Claude, so a sentinel is required to skip.)
+- Drift note: if a `Purpose` exists in memory for the active session AND the captured Intent clearly diverges from it, add a one-line italic note under the Intent field: `_Drift from original purpose: {one-line description of the shift}_`. If no Purpose is in memory (e.g. a pre-existing session), omit the drift note entirely.
 
 ## Snapshot Format
 
 ```
 ## Progress Snapshot {N} - {timestamp}
+
+### Intent
+{intent, or "(not provided)" if skipped}
+{optional: _Drift from original purpose: ..._}
 
 ### Executive Summary
 [7-10 sentences summarizing overall session progress, goals achieved, and current state]
@@ -61,10 +73,13 @@ Steps:
 
 ### Resume Context
 [A dense 5-8 sentence paragraph written FOR Claude, containing everything needed
-to continue this session after compaction or in a new conversation. Include: current
-goal, what has been done so far, what is in progress, key files involved, architectural
-context, and the immediate next step. This must be self-contained -- assume the reader
-has zero prior context about this session.]
+to continue this session after compaction or in a new conversation. LEAD with the
+goal: open with the session Purpose plus the latest snapshot Intent (e.g., "Goal:
+{Purpose}; currently {Intent}."). If intent/purpose were skipped, fall back to the
+auto-inferred goal as the opening instead -- do not write an empty "Goal:" line.
+Then continue with: what has been done so far, what is in progress, key files involved,
+architectural context, and the immediate next step. This must be self-contained --
+assume the reader has zero prior context about this session.]
 
 ---
 ```
